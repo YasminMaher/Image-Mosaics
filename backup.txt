@@ -1,0 +1,459 @@
+1657.9310739898337 444.48359946849655
+736.327252002139 -89.93914157462093
+
+circle1
+[[ 12 178]
+ [ 50 169]
+ [ 52 395]
+ [ 78 385]
+ [ 72 495]
+ [ 93 495]
+ [ 80 502]
+ [102 503]
+ [100 522]
+ [ 80 521]
+ [ 82 591]
+ [ 76 615]
+ [102 615]
+ [250 609]
+ [302 539]
+ [390 559]
+ [390 574]
+ [443 558]
+ [441 575]
+ [370 292]
+ [438 303]
+ [475 308]
+ [498 323]
+ [522 315]
+ [526 336]]
+
+
+
+
+
+
+
+circle2
+<[[465 239]
+ [496 230]
+ [515 444]
+ [536 429]
+ [535 535]
+ [556 537]
+ [542 542]
+ [564 543]
+ [564 559]
+ [542 558]
+ [551 627]
+ [546 650]
+ [572 647]
+ [715 645]
+ [759 574]
+ [851 593]
+ [852 608]
+ [905 593]
+ [907 611]
+ [813 320]
+ [883 327]
+ [926 328]
+ [948 342]
+ [976 332]
+ [979 354]]>
+
+ bonus corr
+circle1
+[[453  46]
+ [468  47]
+ [454 106]
+ [467 107]
+ [434 174]
+ [489 175]
+ [522 472]
+ [463 470]
+ [385 334]
+ [654 464]
+ [646 426]
+ [360 478]
+ [173 435]
+ [242 341]
+ [808 322]
+ [889 374]
+ [936 256]
+ [983 163]
+ [904 475]
+ [552 310]]
+circle2
+[[ 485  245]
+ [ 498  246]
+ [ 484  303]
+ [ 498  305]
+ [ 462  369]
+ [ 518  370]
+ [ 553  671]
+ [ 490  669]
+ [ 412  527]
+ [ 684  664]
+ [ 676  624]
+ [ 385  676]
+ [ 197  627]
+ [ 270  534]
+ [ 839  519]
+ [ 921  572]
+ [ 966  451]
+ [1009  360]
+ [ 939  675]
+ [ 581  506]]
+[[ 0.005 -0.     0.221]
+ [ 0.     0.005  0.975]
+ [-0.    -0.     0.005]]
+ 1507.0828641186924 9.658557738438127
+914.5342741647455 199.99825628575684
+1507.0828641186924 9.658557738438127
+914.5342741647455 199.99825628575684
+
+back coe
+'''
+
+circles_s=[[453,  46],
+ [468 , 47],
+ [454, 106],
+ [467, 107],
+ [434, 174],
+ [489, 175],
+ [522, 472],
+ [463, 470],
+ [385, 334],
+ [654, 464],
+ [646, 426],
+ [360, 478],
+ [173, 435],
+ [242, 341],
+ [808, 322],
+ [889, 374],
+ [936, 256],
+ [983, 163],
+ [904, 475],
+ [552, 310]]
+circles2=[[ 485,  245],
+ [ 498,  246],
+ [ 484,  303],
+ [ 498,  305],
+ [ 462,  369],
+ [ 518,  370],
+ [ 553,  671],
+ [ 490 , 669],
+ [ 412 , 527],
+ [ 684 , 664],
+ [ 676 , 624],
+ [ 385 , 676],
+ [ 197 , 627],
+ [ 270 , 534],
+ [ 839 , 519],
+ [ 921 , 572],
+ [ 966 , 451],
+ [1009 , 360],
+ [ 939 , 675],
+ [ 581 , 506]]
+
+
+HS2=homography(circles_s,circles2)
+print(HS2)
+
+img_to_Check = cv2.imread('shanghai-22.png')
+
+#check if the homography matix is correctly computes
+coordinates=len(circles_s)
+print(coordinates)
+check=np.zeros((coordinates,2),int)
+print(check)
+for coordinate in range(coordinates):
+    src_coordinates = circles_s[coordinate]
+    src_coordinates = np.asarray(src_coordinates)
+    src_coordinates = src_coordinates.reshape(2, 1)
+    z = matrix(1)
+    src_coordinates = np.concatenate((src_coordinates, z))
+    src_coordinates = np.asmatrix(src_coordinates)
+
+    des_coordinates = np.matmul(HS2, src_coordinates)
+
+
+    des_coordinates = des_coordinates / des_coordinates[2]
+    check[coordinate][0] = des_coordinates[0]
+    check[coordinate][1] = des_coordinates[1]
+    cv2.circle(img_to_Check,(check[coordinate][0], check[coordinate][1]), 2, (0, 0, 255), cv2.FILLED)  # color the point you've just clicked
+
+print(check.astype('int32'))
+cv2.imshow("image2", img_to_Check)
+cv2.waitKey(0)
+#Forward_warped_img,x_min,y_min=  Forward_warp(Stitched_img_src,HS2)
+Forward_warped_img=cv2.imread('Final_Forward_warped_img2_bonus.jpg')
+
+x_min=9.658557738438127
+y_min= 199.99825628575684
+
+Inverse_warped_img=Inverse_warp(Forward_warped_img,Stitched_img_src,HS2,x_min, y_min)
+plt.imshow(cv2.cvtColor(Inverse_warped_img, cv2.COLOR_BGR2RGB))
+plt.show()
+StitchB(Inverse_warped_img,img_src2,x_min,y_min)
+
+
+'''
+'''
+#stitch the 2nd on the already stitched img
+while True: #this while is to colour the points
+
+    cv2.imshow("image2", img2)
+    cv2.setMouseCallback("image2",img2_mousePoints)
+
+    cv2.imshow("imageS", Stitched_img)
+    cv2.setMouseCallback("imageS", imgs_mousePoints)
+
+    if((counter2==num_clicks) & (counter_s==num_clicks)):
+        cv2.waitKey(0)
+        break
+    cv2.waitKey(1)
+
+'''
+'''
+while True: #this while is to colour the points
+
+    cv2.imshow("image1", img1)
+    cv2.setMouseCallback("image1",img1_mousePoints)
+
+    cv2.imshow("image2", img2)
+    cv2.setMouseCallback("image2",img2_mousePoints)
+
+    if((counter2==num_clicks) & (counter1==num_clicks) & (counter3==num_clicks)):
+        cv2.waitKey(0)
+        break
+    cv2.waitKey(1)
+
+
+#
+
+
+H12=[[-0.,-1. ,0.]
+ [-0.,-0.,-0.]
+ [-0.,-0.,-0.]]
+'''
+'''
+img_to_Check = cv2.imread('shanghai-22.png')
+
+#check if the homography matix is correctly computes
+coordinates=len(circles1)
+print(coordinates)
+check=np.zeros((coordinates,2),int)
+print(check)
+for coordinate in range(coordinates):
+    src_coordinates = circles1[coordinate]
+    src_coordinates = np.asarray(src_coordinates)
+    src_coordinates = src_coordinates.reshape(2, 1)
+    z = matrix(1)
+    src_coordinates = np.concatenate((src_coordinates, z))
+    src_coordinates = np.asmatrix(src_coordinates)
+
+    des_coordinates = np.matmul(H, src_coordinates)
+
+
+    des_coordinates = des_coordinates / des_coordinates[2]
+    check[coordinate][0] = des_coordinates[0]
+    check[coordinate][1] = des_coordinates[1]
+    cv2.circle(img_to_Check,(check[coordinate][0], check[coordinate][1]), 2, (0, 0, 255), cv2.FILLED)  # color the point you've just clicked
+
+print(check.astype('int32'))
+cv2.imshow("image2", img_to_Check)
+cv2.waitKey(0)
+'''
+'''
+x_min=18.88419266553178 #for bonus
+y_min=197.56359252884087 # for bonus
+
+#Forward_warped_img,x_min,y_min=  Forward_warp(img_src1,H)
+#Forward_warped_img=cv2.imread('Forward_warped_img.jpg')
+
+#Inverse_warped_img=Inverse_warp(Forward_warped_img,img_src1,H,x_min, y_min)
+Inverse_warped_img=cv2.imread('Inverse_warped_img_bonus.jpg')
+
+
+
+plt.imshow(cv2.cvtColor(Inverse_warped_img, cv2.COLOR_BGR2RGB))
+plt.show()
+#Stitched_1=StitchB(Inverse_warped_img,img_src2,x_min,y_min)
+'''
+
+'''
+counter3= 0 #how many clicks
+counter_s= 0 #how many clicks
+
+
+circles3= np.zeros((num_clicks,2),int)
+circles_s= np.zeros((num_clicks,2),int)
+
+'''
+
+
+'''
+while True: #this while is to colour the points
+
+    cv2.imshow("image1", img1)
+    cv2.setMouseCallback("image1",img1_mousePoints)
+
+    cv2.imshow("image3", img3)
+    cv2.setMouseCallback("image3", img3_mousePoints)
+
+    if((counter1==num_clicks) & (counter3==num_clicks)):
+        cv2.waitKey(0)
+        break
+    cv2.waitKey(1)
+
+'''
+'''
+
+
+
+
+HS3=homography(circles3,circles1)
+print(HS3)
+
+
+img_to_Check = img_src1
+
+#check if the homography matix is correctly computes
+coordinates=len(circles3)
+print(coordinates)
+check=np.zeros((coordinates,2),int)
+print(check)
+for coordinate in range(coordinates):
+    src_coordinates = circles3[coordinate]
+    src_coordinates = np.asarray(src_coordinates)
+    src_coordinates = src_coordinates.reshape(2, 1)
+    z = matrix(1)
+    src_coordinates = np.concatenate((src_coordinates, z))
+    src_coordinates = np.asmatrix(src_coordinates)
+
+    des_coordinates = np.matmul(HS3, src_coordinates)
+
+
+    des_coordinates = des_coordinates / des_coordinates[2]
+    check[coordinate][0] = des_coordinates[0]
+    check[coordinate][1] = des_coordinates[1]
+    cv2.circle(img_to_Check,(check[coordinate][0], check[coordinate][1]), 2, (0, 0, 255), cv2.FILLED)  # color the point you've just clicked
+
+print(check.astype('int32'))
+cv2.imshow("image2", img_to_Check)
+cv2.waitKey(0)
+
+
+#Forward_warped_img,x_min,y_min=  Forward_warp(img_src3,HS3)
+Forward_warped_img=cv2.imread('Forward_warped_img2_bonus.jpg')
+x_min=336.777196087556
+y_min=-47.42372568452973
+
+Inverse_warped_img=Inverse_warp(Forward_warped_img,img_src3,HS3,x_min, y_min)
+#Inverse_warped_img=cv2.imread('Inverse_warped_img_bonus.jpg')
+
+
+
+plt.imshow(cv2.cvtColor(Inverse_warped_img, cv2.COLOR_BGR2RGB))
+plt.show()
+StitchB(Inverse_warped_img,img1,x_min,y_min)
+
+'''
+
+'''
+
+#first function: we get correspondecies
+
+num_clicks=input("How many clicks you'll make : ")
+num_clicks = int(num_clicks)
+
+img_src1 = cv2.imread('image1.jpg')
+img_src2 = cv2.imread('image2.jpg')
+
+img1=cv2.imread('image1_dotted.jpg')
+img2=cv2.imread('image2_dotted.jpg')
+
+
+
+circles1= np.zeros((num_clicks,2),int)
+circles2= np.zeros((num_clicks,2),int)
+
+
+#could be commented if we will take points from the user min:4
+
+'''
+
+#a while loop incase we are requseting user to give us input
+'''
+while True: #this while is to colour the points
+
+    cv2.imshow("image1", img1)
+    cv2.setMouseCallback("image1",img1_mousePoints)
+
+    cv2.imshow("image2", img2)
+    cv2.setMouseCallback("image2",img2_mousePoints)
+
+
+    if((counter2==num_clicks) & (counter1==num_clicks)):
+        cv2.waitKey(0)
+        break
+    cv2.waitKey(1)
+
+
+'''
+
+'''
+#
+H=homography(circles1,circles2)
+img_to_Check = cv2.imread('shanghai-22.png')
+
+'''
+
+'''
+
+#check if the homography matix is correctly computes
+coordinates=len(circles1)
+print(coordinates)
+check=np.zeros((coordinates,2),int)
+print(check)
+for coordinate in range(coordinates):
+    src_coordinates = circles1[coordinate]
+    src_coordinates = np.asarray(src_coordinates)
+    src_coordinates = src_coordinates.reshape(2, 1)
+    z = matrix(1)
+    src_coordinates = np.concatenate((src_coordinates, z))
+    src_coordinates = np.asmatrix(src_coordinates)
+
+    des_coordinates = np.matmul(H, src_coordinates)
+
+
+    des_coordinates = des_coordinates / des_coordinates[2]
+    check[coordinate][0] = des_coordinates[0]
+    check[coordinate][1] = des_coordinates[1]
+    cv2.circle(img_to_Check,(check[coordinate][0], check[coordinate][1]), 2, (0, 0, 255), cv2.FILLED)  # color the point you've just clicked
+
+print(check.astype('int32'))
+cv2.imshow("image2", img_to_Check)
+cv2.waitKey(0)
+'''
+
+'''
+
+x_min=444.48359946849655 #for first proj
+y_min=-89.93914157462093 # for first proj
+
+#Forward_warped_img,x_min,y_min=  Forward_warp(img_src1,H)
+#Forward_warped_img=cv2.imread('Forward_warped_img.jpg')
+
+#Inverse_warped_img=Inverse_warp(Forward_warped_img,img_src1,H,x_min, y_min)
+Inverse_warped_img=cv2.imread('Inverse_warped.jpg')
+
+
+
+plt.imshow(cv2.cvtColor(Inverse_warped_img, cv2.COLOR_BGR2RGB))
+plt.show()
+Stitch(Inverse_warped_img,img_src2,x_min,y_min)
+
+'''
+
